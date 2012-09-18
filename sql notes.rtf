@@ -1,0 +1,164 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1187
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fswiss\fcharset0 ArialMT;}
+{\colortbl;\red255\green255\blue255;\red52\green52\blue52;\red228\green228\blue228;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid1\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{none\}}{\leveltext\leveltemplateid101\'00;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid2}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+
+\f0\fs24 \cf0 MySQL\
+\
+- Free\
+-MySQL can handle high traffic\
+- No optimisations\
+\
+phpMyAdmin\
+MySQLWorkbench\
+\
+- varchar can contain characters from 0 to 255.\
+- f9 seems to be used a lot for execution of sql statements\
+\
+find def for primary key and foreign key\
+\
+SELECT <column_names> FROM <table_name> WHERE <conditions>\
+\
+INSERT INTO <table_name> (<column_names> VALUE (<values>)\
+note:\
+<values> corresponds to the values to be inserted to the DB, if more than one value is to be inserted, the values are comma separated.\
+\
+DELETE FROM <table_name> WHERE <condition>\
+\
+UPDATE <table_name> SET <field> = <value> WHERE <condition>\
+\
+\
+Assignment Answers:\
+\pard\pardeftab720
+
+\f1 \cf2 1- What query would you run to get a list of revenue for each month of the year?\
+ANSWER\
+\
+SELECT DATE_FORMAT(DATE(t1.charged_datetime),"%M") AS "charged_month",YEAR(t1.charged_datetime) AS "charged_year", SUM(t1.amount) AS "Revenue"\
+FROM billing as t1\
+GROUP BY MONTH(t1.charged_datetime),YEAR(t1.charged_datetime)\
+ORDER BY(t1.charged_datetime);
+\f0 \cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+\cf0 \
+\pard\pardeftab720
+
+\f1 \cf2 2- What query would you run to get total revenue collected from client_id = 2?\
+ANSWER\
+\
+SELECT t1.client_id AS "client_id", SUM(t1.amount) as "total_revenue" \
+FROM billing as t1\
+WHERE client_id=2;\
+\
+3- What query would you run to get all the sites that client_id = 1 owns?\
+ANSWER\
+\
+SELECT domain_name AS "website" , client_id\
+FROM sites\
+WHERE client_id = 1\
+\
+\pard\tx7\tx720\pardeftab720\li13\fi-14
+\ls1\ilvl0\cf2 4- What query would you run to get total # of sites created each month for client_id = 1? What about for client_id = 2?\
+\
+ANSWER for client_id = 1 \'85\
+\
+SELECT client_id,COUNT(client_id) AS "number_of_websites", DATE_FORMAT(DATE(created_datetime),'%M') AS "month_created",DATE_FORMAT(DATE(created_datetime),'%Y') AS "year_created"\
+FROM sites\
+WHERE client_id = 1\
+GROUP BY (MONTH(created_datetime))\
+ORDER BY YEAR(created_datetime),MONTH(created_datetime);\
+\
+\pard\tx7\tx720\pardeftab720\li13\fi-14
+\ls1\ilvl0\cf2 ANSWER for client_id = 2 \'85\
+\
+\pard\tx7\tx720\pardeftab720\li13\fi-14
+\ls1\ilvl0\cf2 SELECT client_id,COUNT(client_id) AS "number_of_websites", DATE_FORMAT(DATE(created_datetime),'%M') AS "month_created",DATE_FORMAT(DATE(created_datetime),'%Y') AS "year_created"\
+FROM sites\
+WHERE client_id = 2\
+GROUP BY (MONTH(created_datetime))\
+ORDER BY YEAR(created_datetime),MONTH(created_datetime);\
+\
+\
+5. What query would you run to get the total # of leads we've generated for each of our sites between January 1st 2011 to February 15th 2011?\
+ANSWER\
+\
+SELECT t2.domain_name AS "website", COUNT(*) AS "number_of_leads", DATE_FORMAT(DATE(t1.registered_datetime),'%M %d, %Y') AS date_generated\
+FROM leads AS t1\
+LEFT JOIN sites as t2 ON t1.site_id = t2.site_id\
+WHERE DATE(t1.registered_datetime) >= '2011-01-01' AND DATE(t1.registered_datetime) <= '2011-02-15'\
+GROUP BY (t1.site_id)\
+ORDER BY (t2.domain_name);\
+\
+\pard\tx53\tx720\pardeftab720\li98\fi-99
+\ls1\ilvl0\cf2 6. What query would you run to get a list of client name and the total # of leads we've generated for each of our client between January 1st 2011 to February 15th 2011?\
+ANSWER\
+\
+SELECT CONCAT(t3.first_name," ",t3.last_name) AS 'client_name',\
+COUNT(*) AS "number_of_leads", DATE_FORMAT(DATE(t1.registered_datetime),'%M %d, %Y') AS 'date_generated'\
+FROM leads AS t1\
+LEFT JOIN sites AS t2 on t1.site_id = t2.site_id\
+LEFT JOIN clients AS t3 ON t2.client_id = t3.client_id\
+WHERE DATE(t1.registered_datetime) >= '2011-01-01' AND DATE(t1.registered_datetime) <= '2011-02-15'\
+GROUP BY (t1.site_id);\
+\
+\pard\tx26\tx720\pardeftab720\li226\fi-227
+\ls1\ilvl0\cf2 7. What query would you run to get a list of client name and the total # of leads we've generated for each client each month between month 1 - 5 of Year 2011?\
+ANSWER\
+\
+SELECT CONCAT(t3.first_Name," ",t3.last_name) AS "client_name", COUNT(*) AS "number_of_leads", DATE_FORMAT (DATE(t1.registered_datetime),"%M") AS "month_generated"\
+FROM leads AS t1\
+LEFT JOIN sites AS t2 on t1.site_id = t2.site_id\
+LEFT JOIN clients AS t3 ON t2.client_id = t3.client_id\
+WHERE YEAR(t1.registered_datetime)='2011'\
+AND (MONTH(t1.registered_datetime) >= 1 AND MONTH(t1.registered_datetime) <= 5)\
+GROUP BY MONTH(t1.registered_datetime),t3.client_id;\
+\
+\
+8. (1) What query would you run to get a list of client name and the total # of leads we've generated for each of our client's site between January 1st 2011 to February 15th 2011? \
+    (2) Come up with one query that shows all the clients, the site name, and the total number of leads generated from each site.\
+ANSWER\
+\
+For part 1:\
+SELECT CONCAT(t3.first_name,' ', t3.last_name) AS "client_name", t2.domain_name AS "website",COUNT(*) AS "number_of_leads", DATE_FORMAT(DATE(t1.registered_datetime),'%M %d, %Y') AS 'date_generated'\
+FROM leads AS t1\
+LEFT JOIN sites AS t2 ON t1.site_id = t2.site_id\
+LEFT JOIN clients AS t3 ON t2.client_id = t3.client_id\
+WHERE (DATE(t1.registered_datetime) >= '2011-01-01'AND DATE(t1.registered_datetime) <= '2011-02-15')\
+GROUP BY (t1.site_id);\
+\
+For part 2 :\
+SELECT CONCAT(t1.first_name,' ', t1.last_name) AS "client_name", t2.domain_name AS "website",COUNT(t3.site_id) AS "number_of_leads"\
+FROM clients AS t1\
+LEFT JOIN sites AS t2 ON t1.client_id = t2.client_id\
+LEFT JOIN leads AS t3 ON t2.site_id = t3.site_id\
+GROUP BY t1.client_id, t3.site_id\
+ORDER BY t1.client_id, t2.domain_name\
+limit 0,100;\
+\
+\
+\pard\tx220\tx720\pardeftab720\li720\fi-720
+\ls1\ilvl0\cf2 9. Write a single query that retrieves total revenue collected from each client each month of the year\
+ANSWER\
+\
+SELECT CONCAT(t2.first_name," ",t2.last_name) AS "client_name", SUM(t1.amount) AS "Total_Revenue",DATE_FORMAT(DATE(t1.charged_datetime),'%M') AS "month_charge",YEAR(t1.charged_datetime) AS "year_charge"\
+FROM billing AS t1\
+LEFT JOIN clients AS t2 ON t1.client_id = t2.client_id\
+GROUP BY t1.client_id,MONTH(t1.charged_datetime),YEAR(t1.charged_datetime)  \
+ORDER BY t1.client_id;\
+\
+\pard\tx220\tx720\pardeftab720\li355\fi-356
+\ls1\ilvl0\cf2 10.Write a single query that retrieves all the sites that each client owns. Group the results so that each row shows a new client and have a new field called 'sites' that has all the sites that the client owns. (HINT: use GROUP_CONCAT)\
+ANSWER\
+\
+select CONCAT(t2.first_name," ",t2.last_name) AS 'client_name', GROUP_CONCAT(t1.domain_name SEPARATOR ' / ') AS 'sites'\
+from sites AS t1\
+LEFT JOIN clients AS t2 ON t1.client_id = t2.client_id\
+GROUP BY t2.client_id\
+\pard\tx220\tx720\pardeftab720\li720\fi-720
+\ls2\ilvl0\cf2 \cb3 		\uc0\u8232 
+\f0 \cf0 \cb1 \
+}
